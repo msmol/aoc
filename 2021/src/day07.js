@@ -20,9 +20,10 @@ console.log(Math.min(...costs));
 
 function getAlignmentCostPart2(alignmentNumber) {
   return data
-    .map(d => Array
-      .from({ length: Math.abs(d - alignmentNumber) + 1 }, (_, index) => index)
-      .reduce((acc, curr) => acc + curr, 0))
+    .map(d => {
+      const n = Math.abs(d - alignmentNumber);
+      return (n*(n+1))/2;
+    })
     .reduce((acc, curr) => acc + curr, 0);
 }
 

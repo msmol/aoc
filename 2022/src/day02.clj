@@ -30,13 +30,15 @@
     :else 0))
 
 (defn score [opponent self]
-  (cond
-    (= (map-play opponent) (map-play self)) (+ 3 (choice-amount (map-play self))) ; a draw gets 3 + choice-amount
-    (wins? (map-play opponent) (map-play self)) (+ 6 (choice-amount (map-play self))) ; a win gets 6 + choice-amount
-    :else (+ 0 (choice-amount (map-play self))))) ; a loss gets 0 + choice-amount
+  (let [opponent-play (map-play opponent)
+        self-play (map-play self)]
+    (cond
+      (= opponent-play self-play) (+ 3 (choice-amount self-play)) ; a draw gets 3 + choice-amount
+      (wins? opponent-play self-play) (+ 6 (choice-amount self-play)) ; a win gets 6 + choice-amount
+      :else (+ 0 (choice-amount self-play))))) ; a loss gets 0 + choice-amount
 
 (def plays
-  (vec (map #(str/split %1 #" ") (str/split data #"\n"))))
+  (map #(str/split %1 #" ") (str/split data #"\n")))
 
 (def scores
   (map (fn [play] (apply score play)) plays))

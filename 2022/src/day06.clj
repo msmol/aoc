@@ -7,13 +7,7 @@
 
 (defn find-marker [marker-length]
   (->> data
-       (map-indexed (fn [i _]
-                      (let [end-index (+ i marker-length)]
-                        (if (< end-index (count data))
-                          (subvec data i end-index)
-                          nil)
-                        )))
-       (filter not-empty)
+       (partition marker-length 1)
        (map #(count (set %1)))
        (#(.indexOf %1 marker-length))
        (+ marker-length)))

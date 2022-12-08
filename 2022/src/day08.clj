@@ -20,15 +20,11 @@
         above (subvec (get all-trees x) 0 y)
         below (subvec (get all-trees x) (+ y 1) (count (get all-trees x)))
         tree (get-in trees [x y])]
-    (->> [left right above below]
-         (some (fn [direction]
-                 (every? (fn [t]
-                           (> tree t)) direction))))))
+    (some (fn [direction]
+            (every? #(> tree %1) direction)) [left right above below])))
 
 (println "Part 1:" (->> trees
-                        (map-indexed (fn [y column]
-                                       (map-indexed (fn [x _]
-                                                      (is-visible? trees x y)) column)))
+                        (map-indexed (fn [y column] (map-indexed (fn [x _] (is-visible? trees x y)) column)))
                         flatten
                         (filter #(true? %1))
                         count))
@@ -51,20 +47,14 @@
   "Gets the scenic score of a tree"
   [all-trees x y]
   (let [transposed (transpose trees)
-        left (reverse (subvec (get transposed y) 0 x))
-        right (subvec (get transposed y) (+ x 1) (count (get all-trees y)))
-        above (reverse (subvec (get all-trees x) 0 y))
-        below (subvec (get all-trees x) (+ y 1) (count (get all-trees x)))
         tree (get-in trees [x y])
-        left-view (get-view tree left)
-        right-view (get-view tree right)
-        above-view (get-view tree above)
-        below-view (get-view tree below)]
+        left-view (get-view tree (reverse (subvec (get transposed y) 0 x)))
+        right-view (get-view tree (subvec (get transposed y) (+ x 1) (count (get all-trees y))))
+        above-view (get-view tree (reverse (subvec (get all-trees x) 0 y)))
+        below-view (get-view tree (subvec (get all-trees x) (+ y 1) (count (get all-trees x))))]
     (* left-view right-view above-view below-view)))
 
 (println "Part 2:" (->> trees
-                        (map-indexed (fn [y column]
-                                       (map-indexed (fn [x _]
-                                                      (scenic-score trees x y)) column)))
+                        (map-indexed (fn [y column] (map-indexed (fn [x _] (scenic-score trees x y)) column)))
                         flatten
                         (apply max)))

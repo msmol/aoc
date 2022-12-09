@@ -11,15 +11,16 @@
                 (map (fn [row] (map #(Integer/parseInt %1) row)))
                 (transpose)))
 
+(def transposed-trees (transpose trees))
+
 (defn is-visible?
   "Determines whether a tree at a given location is visible"
   [all-trees x y]
-  (let [transposed (transpose trees)
-        left (subvec (get transposed y) 0 x)
-        right (subvec (get transposed y) (+ x 1) (count (get all-trees y)))
-        above (subvec (get all-trees x) 0 y)
-        below (subvec (get all-trees x) (+ y 1) (count (get all-trees x)))
-        tree (get-in trees [x y])]
+  (let [left (take x (get transposed-trees y))
+        right (drop (inc x) (get transposed-trees y))
+        above (take y (get all-trees x))
+        below (drop (inc y) (get all-trees x))
+        tree (get-in all-trees [x y])]
     (some (fn [direction]
             (every? #(> tree %1) direction)) [left right above below])))
 
@@ -46,12 +47,11 @@
 (defn scenic-score
   "Gets the scenic score of a tree"
   [all-trees x y]
-  (let [transposed (transpose trees)
-        tree (get-in trees [x y])
-        left-view (get-view tree (reverse (subvec (get transposed y) 0 x)))
-        right-view (get-view tree (subvec (get transposed y) (+ x 1) (count (get all-trees y))))
-        above-view (get-view tree (reverse (subvec (get all-trees x) 0 y)))
-        below-view (get-view tree (subvec (get all-trees x) (+ y 1) (count (get all-trees x))))]
+  (let [tree (get-in all-trees [x y])
+        left-view (get-view tree (reverse (take x (get transposed-trees y))))
+        right-view (get-view tree (drop (inc x) (get transposed-trees y)))
+        above-view (get-view tree (reverse (take y (get all-trees x))))
+        below-view (get-view tree (drop (inc y) (get all-trees x)))]
     (* left-view right-view above-view below-view)))
 
 (println "Part 2:" (->> trees

@@ -15,17 +15,17 @@
 
 (defn is-visible?
   "Determines whether a tree at a given location is visible"
-  [all-trees x y]
+  [x y]
   (let [left (take x (get transposed-trees y))
         right (drop (inc x) (get transposed-trees y))
-        above (take y (get all-trees x))
-        below (drop (inc y) (get all-trees x))
-        tree (get-in all-trees [x y])]
+        above (take y (get trees x))
+        below (drop (inc y) (get trees x))
+        tree (get-in trees [x y])]
     (some (fn [direction]
             (every? #(> tree %1) direction)) [left right above below])))
 
 (println "Part 1:" (->> trees
-                        (map-indexed (fn [y column] (map-indexed (fn [x _] (is-visible? trees x y)) column)))
+                        (map-indexed (fn [y column] (map-indexed (fn [x _] (is-visible? x y)) column)))
                         flatten
                         (filter #(true? %1))
                         count))
@@ -46,15 +46,15 @@
 
 (defn scenic-score
   "Gets the scenic score of a tree"
-  [all-trees x y]
-  (let [tree (get-in all-trees [x y])
+  [x y]
+  (let [tree (get-in trees [x y])
         left-view (get-view tree (reverse (take x (get transposed-trees y))))
         right-view (get-view tree (drop (inc x) (get transposed-trees y)))
-        above-view (get-view tree (reverse (take y (get all-trees x))))
-        below-view (get-view tree (drop (inc y) (get all-trees x)))]
+        above-view (get-view tree (reverse (take y (get trees x))))
+        below-view (get-view tree (drop (inc y) (get trees x)))]
     (* left-view right-view above-view below-view)))
 
 (println "Part 2:" (->> trees
-                        (map-indexed (fn [y column] (map-indexed (fn [x _] (scenic-score trees x y)) column)))
+                        (map-indexed (fn [y column] (map-indexed (fn [x _] (scenic-score x y)) column)))
                         flatten
                         (apply max)))
